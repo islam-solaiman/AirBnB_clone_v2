@@ -1,17 +1,19 @@
 #!/usr/bin/python3
-# Fabfile to create and distribute an archive to a web server.
+# Fabfile to create, distribute archive to web server.
 import os.path
-from datetime import datetime
 from fabric.api import env
-from fabric.api import local
 from fabric.api import put
 from fabric.api import run
+from fabric.api import local
+from datetime import datetime
 
-env.hosts = ["104.196.168.90", "35.196.46.172"]
+env.hosts = ["54.160.87.92", "100.25.104.155"]
 
 
 def do_pack():
-    """Create a tar gzipped archive of the directory web_static."""
+    """
+        Create tar gzipped archive of directory web_static.
+    """
     dt = datetime.utcnow()
     file = "versions/web_static_{}{}{}{}{}{}.tgz".format(dt.year,
                                                          dt.month,
@@ -28,7 +30,8 @@ def do_pack():
 
 
 def do_deploy(archive_path):
-    """Distributes an archive to a web server.
+    """
+    Distributes archive to a web server.
 
     Args:
         archive_path (str): The path of the archive to distribute.
@@ -36,3 +39,14 @@ def do_deploy(archive_path):
         If the file doesn't exist at archive_path or an error occurs - False.
         Otherwise - True.
     """
+    if os.path.isfile(archive_path) is False:
+        return False
+    file = archive_path.split("/")[-1]
+    name = file.split(".")[0]
+
+    if put(archive_path, "/tmp/{}".format(file)).failed is True:
+        return False
+    if run("rm -rf /data/web_static/releases/{}/".
+           format(name)).failed is True:
+        return False
+    if run("mkdir -p /data/web_static/releases/{}/".
