@@ -55,8 +55,14 @@ def hbnb():
     return "HBNB"
 
 
-@app.route("/python", strict_slashes=False)
 @app.route("/c/<text>", strict_slashes=False)
+def c(text):
+    return 'C {}'.format(text.replace("_", " "))
+
+
+
+@app.route("/python", strict_slashes=False)
+@app.route("/python/<text>", strict_slashes=False)
 def c(text="is cool"):
     return 'python {}'.format(text.replace("_", " "))
 
